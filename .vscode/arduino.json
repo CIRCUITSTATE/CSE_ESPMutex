@@ -1,0 +1,6 @@
+{
+    "configuration": "FlashSize=16M,LoopCore=1,EventsCore=1,USBMode=default,CDCOnBoot=cdc,MSCOnBoot=default,DFUOnBoot=default,UploadMode=default,PartitionScheme=gen4esp32scheme1,CPUFreq=240,UploadSpeed=921600,DebugLevel=none,EraseFlash=none,DisplayModel=esp32s3_24",
+    "board": "esp32:esp32:gen4-ESP32-S3R8n16",
+    "port": "COM7",
+    "sketch": "examples\\Basic\\Basic.ino"
+}

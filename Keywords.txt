@@ -1,0 +1,26 @@
+#######################################
+# Syntax Coloring Map
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+CSE_ESPMutex   KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+lock         KEYWORD2
+unlock     KEYWORD2
+getValue     KEYWORD2
+setValue     KEYWORD2
+getName     KEYWORD2
+setName     KEYWORD2
+
+######################################
+# Constants (LITERAL1)
+#######################################
+
+

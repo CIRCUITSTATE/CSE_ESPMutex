@@ -1,0 +1,20 @@
+{
+    "name": "CSE_ESPMutex",
+    "keywords": "tasks, mutex, semaphore, synchronization, concurrency",
+    "description": "Mutex variable management for ESP32 microcontrollers. Allows you to create and manage mutex protected shared variables between concurrent tasks",
+    "repository":
+    {
+        "type": "git",
+        "url": "https://github.com/CIRCUITSTATE/CSE_ESPMutex.git"
+    },
+    "authors":
+    {
+        "name": "Vishnu Mohanan",
+        "url": "https://github.com/vishnumaiea",
+        "maintainer": true
+    },
+    "version": "0.0.1",
+    "license": "MIT",
+    "frameworks": "arduino",
+    "platforms": "espressif32"
+}
