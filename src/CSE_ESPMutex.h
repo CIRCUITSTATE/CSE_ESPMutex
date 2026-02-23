@@ -6,10 +6,10 @@
   Framework: ESP32-Arduino, PlatformIO
   Author: Vishnu Mohanan (@vishnumaiea, @vizmohanan)
   Maintainer: CIRCUITSTATE Electronics (@circuitstate)
-  Version: 0.0.4
+  Version: 0.0.5
   License: MIT
   Source: https://github.com/CIRCUITSTATE/CSE_ESPMutex
-  Last Modified: +05:30 00:17:35 AM 24-02-2026, Tuesday
+  Last Modified: +05:30 00:51:05 AM 24-02-2026, Tuesday
  */
 //============================================================================================//
 
@@ -53,9 +53,29 @@ class CSE_ESPMutex {
 
     // Destructor to clean up the mutex.
     ~CSE_ESPMutex() {
-      if (mutex != NULL) {
-        vSemaphoreDelete (mutex);
-      }
+      // Try a non-blocking cleanup; if it fails, do nothing to avoid blocking in dtor.
+      deinit (0);
+    }
+
+    //--------------------------------------------------------------------------------------------//
+
+    // Attempt to cleanly destroy the mutex. Caller MUST ensure no other tasks will
+    // touch this object after calling deinit(). Returns true on success.
+    bool deinit (uint32_t timeout = portMAX_DELAY) {
+      if (!initialized) return true; // Already deinitialized
+
+      // Try to acquire mutex to ensure exclusive access.
+      if (!lock (timeout)) return false; // Couldn't get exclusive access
+
+      // We now own the mutex; mark as uninitialized so other callers won't proceed.
+      initialized = false;
+      owner = nullptr;
+
+      // Release the semaphore handle and delete it.
+      xSemaphoreGive (mutex); // Release before delete (we held it)
+      vSemaphoreDelete (mutex);
+      mutex = NULL;
+      return true;
     }
 
     //--------------------------------------------------------------------------------------------//

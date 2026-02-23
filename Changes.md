@@ -2,6 +2,13 @@
 # Changes
 
 #
+### **+05:30 12:31:51 AM 24-02-2026, Tuesday**
+
+  - Improved the `~CSE_ESPMutex()` destructor.
+    - Added `deinit()` to safely lock the mutex and delete it.
+  - New Version 🆕 `0.0.5`.
+
+#
 ### **+05:30 12:15:54 AM 24-02-2026, Tuesday**
 
   - Removed the critical section from the `unlock()` method.
