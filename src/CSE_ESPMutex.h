@@ -6,10 +6,10 @@
   Framework: ESP32-Arduino, PlatformIO
   Author: Vishnu Mohanan (@vishnumaiea, @vizmohanan)
   Maintainer: CIRCUITSTATE Electronics (@circuitstate)
-  Version: 0.0.2
+  Version: 0.0.3
   License: MIT
   Source: https://github.com/CIRCUITSTATE/CSE_ESPMutex
-  Last Modified: +05:30 22:55:52 PM 23-02-2026, Monday
+  Last Modified: +05:30 23:52:22 PM 23-02-2026, Monday
  */
 //============================================================================================//
 
@@ -65,6 +65,10 @@ class CSE_ESPMutex {
     bool lock (uint32_t timeout = portMAX_DELAY) {
       if (!initialized) return false;
 
+      if (owner == xTaskGetCurrentTaskHandle()) {
+        return true; // Already owned by the caller
+      }
+
       if (xSemaphoreTake (mutex, timeout) == pdTRUE) {
         owner = xTaskGetCurrentTaskHandle(); // Update the owner
         return true;
@@ -75,12 +79,19 @@ class CSE_ESPMutex {
     //--------------------------------------------------------------------------------------------//
 
     // Release the already acquired lock on the mutex.
-    void unlock() {
-      if (!initialized) return;
+    bool unlock() {
+      if (!initialized) return false;
+      
       // Only the owner should release the mutex.
-      if (owner != xTaskGetCurrentTaskHandle()) return;
-      owner = nullptr;
-      xSemaphoreGive (mutex);
+      if (owner == xTaskGetCurrentTaskHandle()) {
+        taskENTER_CRITICAL(); // Enter critical section to prevent context switch while releasing the mutex
+          xSemaphoreGive (mutex);
+          owner = nullptr; // Clear the owner after releasing the mutex
+        taskEXIT_CRITICAL(); // Exit critical section
+        return true;
+      }
+      
+      return false;
     }
 
     //--------------------------------------------------------------------------------------------//
@@ -91,39 +102,44 @@ class CSE_ESPMutex {
     T getValue (bool toLock, uint32_t timeout = portMAX_DELAY) {
       T localValue = T();
       
-      if (!initialized && toLock) return localValue;
+      if (!initialized) return localValue; // Return if the mutex is not initialized
 
-      if (toLock) { // Try to get a lock before accessing the value
-        if (xSemaphoreTake (mutex, timeout) == pdTRUE) {
-          localValue = value; // Copy the value to a local variable while we have the lock
-          xSemaphoreGive (mutex); // Release the lock immediately after copying the value
+      // If the task already owns the mutex, we don't need to lock it again.
+      if (owner == xTaskGetCurrentTaskHandle()) {
+        localValue = value; // Copy the value directly
+      }
+      else if (toLock) { // If we need to a lock before accessing the value
+        if (lock (timeout)) { // Acquire the lock
+          localValue = value; // Get the value while we have the lock
+          unlock(); // Release the lock immediately after getting the value
         }
       }
-      else {
-        localValue = value; // If no need to lock, just return the value directly.
-      }
+      
       return localValue;
     }
 
     //--------------------------------------------------------------------------------------------//
 
     // Set value of the protected variable. If `toLock` is true, it will attempt to lock the mutex
-    // before setting the value. If you already have a lock on the mutex, you can set `toLock` to
-    // `false` to set the value directly.
-    bool setValue (bool toLock,T newValue, uint32_t timeout = portMAX_DELAY) {
-      if (!initialized && toLock) return false;
+    // before setting the value. If you already have a lock on the mutex, then the value is set
+    // directly without trying to acquire the lock again. In that case, value of `toLock`
+    // has no effect.
+    bool setValue (bool toLock, T newValue, uint32_t timeout = portMAX_DELAY) {
+      if (!initialized) return false; // Return if the mutex is not initialized
 
-      if (toLock) { // Try to get a lock before accessing the value
-        if (xSemaphoreTake (mutex, timeout) == pdTRUE) {
+      // If the task already owns the mutex, we don't need to lock it again.
+      if (owner == xTaskGetCurrentTaskHandle()) {
+        value = newValue; // Set the value directly
+        return true;
+      }
+      else if (toLock) { // Try to get a lock before accessing the value
+        if (lock (timeout)) { // Acquire the lock
           value = newValue; // Set the new value while we have the lock
-          xSemaphoreGive (mutex); // Release the lock immediately after setting the value
+          unlock(); // Release the lock immediately after setting the value
           return true;
         }
       }
-      else {
-        value = newValue; // If no need to lock, just set the value directly.
-        return true;
-      }
+      
       return false;
     }
 

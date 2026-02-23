@@ -2,6 +2,23 @@
 # Changes
 
 #
+### **+05:30 11:33:50 PM 23-02-2026, Monday**
+
+  - Improved the logic of `getValue()` and `setValue()`.
+    - A value is only written or read if,
+      - The mutex is initialized.
+      - & The caller is the owner of the mutex.
+      - & A lock is acquired as per request before accessing the value variable.
+    - Uses the `lock()` and `unlock()` methods now instead of direct API calls.
+  - Improved the `lock()`.
+    - If the caller already owns the mutex, then there is no need to acquire the lock again.
+    - `true` is returned if that's the case.
+  - Improved the `unlock()`.
+    - Added `bool` return type to indicate success/failure.
+    - Critical section is used to prevent context switching when releasing the mutex and setting the `owner` to `nullptr`.
+  - New Version 🆕 `0.0.3`.
+
+#
 ### **+05:30 10:48:40 PM 23-02-2026, Monday**
 
   - Added `initialized` variable to track the initialization status of the mutex.
