@@ -6,10 +6,10 @@
   Framework: ESP32-Arduino, PlatformIO
   Author: Vishnu Mohanan (@vishnumaiea, @vizmohanan)
   Maintainer: CIRCUITSTATE Electronics (@circuitstate)
-  Version: 0.0.5
+  Version: 0.0.6
   License: MIT
   Source: https://github.com/CIRCUITSTATE/CSE_ESPMutex
-  Last Modified: +05:30 00:51:05 AM 24-02-2026, Tuesday
+  Last Modified: +05:30 01:01:09 AM 24-02-2026, Tuesday
  */
 //============================================================================================//
 
@@ -165,15 +165,15 @@ class CSE_ESPMutex {
 
     // Get the name of the mutex.
     String getName() {
-      if (!initialized) return name;
+      if (!initialized) return String ("NOT INITIALIZED"); // Return if the mutex is not initialized
       
       if (owner == xTaskGetCurrentTaskHandle()) return name; // Already owned by the caller
 
       String localName;
 
-      if (xSemaphoreTake (mutex, portMAX_DELAY) == pdTRUE) {
+      if (lock (portMAX_DELAY)) { // Acquire a lock before getting the name
         localName = name;
-        xSemaphoreGive (mutex);
+        unlock(); // Release the lock immediately after getting the name
       }
       return localName;
     }
@@ -184,10 +184,15 @@ class CSE_ESPMutex {
     bool setName (String mutexName) {
       if (!initialized) return false;
 
-      // Acquire a lock before setting the name.
-      if (xSemaphoreTake (mutex, portMAX_DELAY) == pdTRUE) {
+      if (owner == xTaskGetCurrentTaskHandle()) { // Already owned by the caller
         name = mutexName;
-        xSemaphoreGive (mutex); // Release the lock immediately after setting the name
+        return true;
+      }
+
+      // Acquire a lock before setting the name.
+      if (lock (portMAX_DELAY)) {
+        name = mutexName;
+        unlock(); // Release the lock immediately after setting the name
         return true;
       }
       return false;

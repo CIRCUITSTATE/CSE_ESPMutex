@@ -2,6 +2,15 @@
 # Changes
 
 #
+### **+05:30 01:01:22 AM 24-02-2026, Tuesday**
+
+  - Improved `getName()` and `setName()` methods.
+    - `getName()` returns "NOT INITIALIZED" string if the mutex is not initialized.
+    - Replaced explicit API calls with `lock()` and `unlock()` methods.
+    - A lock is not acquired if the caller is already the owner of the mutex.
+  - New Version 🆕 `0.0.6`.
+
+#
 ### **+05:30 12:31:51 AM 24-02-2026, Tuesday**
 
   - Improved the `~CSE_ESPMutex()` destructor.
