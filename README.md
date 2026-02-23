@@ -37,4 +37,4 @@ Please see the [API.md](/docs/API.md) file for the API reference.
 
 ## References
 
-- 
+- [**How to Write Parallel Multitasking Applications for ESP32 using FreeRTOS & Arduino - CIRCUITSTATE**](https://www.circuitstate.com/tutorials/how-to-write-parallel-multitasking-applications-for-esp32-using-freertos-arduino/)
