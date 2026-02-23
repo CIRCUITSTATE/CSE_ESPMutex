@@ -6,10 +6,10 @@
   Framework: ESP32-Arduino, PlatformIO
   Author: Vishnu Mohanan (@vishnumaiea, @vizmohanan)
   Maintainer: CIRCUITSTATE Electronics (@circuitstate)
-  Version: 0.0.3
+  Version: 0.0.4
   License: MIT
   Source: https://github.com/CIRCUITSTATE/CSE_ESPMutex
-  Last Modified: +05:30 23:52:22 PM 23-02-2026, Monday
+  Last Modified: +05:30 00:17:35 AM 24-02-2026, Tuesday
  */
 //============================================================================================//
 
@@ -84,10 +84,8 @@ class CSE_ESPMutex {
       
       // Only the owner should release the mutex.
       if (owner == xTaskGetCurrentTaskHandle()) {
-        taskENTER_CRITICAL(); // Enter critical section to prevent context switch while releasing the mutex
-          xSemaphoreGive (mutex);
-          owner = nullptr; // Clear the owner after releasing the mutex
-        taskEXIT_CRITICAL(); // Exit critical section
+        owner = nullptr; // Clear the owner after releasing the mutex
+        xSemaphoreGive (mutex);
         return true;
       }
       

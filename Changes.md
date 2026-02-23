@@ -2,6 +2,13 @@
 # Changes
 
 #
+### **+05:30 12:15:54 AM 24-02-2026, Tuesday**
+
+  - Removed the critical section from the `unlock()` method.
+    - It requires another mutex to work.
+  - New Version 🆕 `0.0.4`.
+
+#
 ### **+05:30 11:33:50 PM 23-02-2026, Monday**
 
   - Improved the logic of `getValue()` and `setValue()`.
