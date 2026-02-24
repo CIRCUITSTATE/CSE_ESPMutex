@@ -2,6 +2,11 @@
 # Changes
 
 #
+### **+05:30 08:10:11 PM 24-02-2026, Tuesday**
+
+  - Updated API documentation.
+
+#
 ### **+05:30 01:01:22 AM 24-02-2026, Tuesday**
 
   - Improved `getName()` and `setName()` methods.
